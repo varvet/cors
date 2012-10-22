@@ -25,14 +25,6 @@ describe Manifest do
     it "stringifies the attribute keys" do
       Manifest.new(cool: :Yo, &rules).attributes.should eq({ "cool" => :Yo })
     end
-
-    context "validation rules" do
-      describe "#required" do
-      end
-
-      describe "#optional" do
-      end
-    end
   end
 
   describe "#validate" do
@@ -49,12 +41,68 @@ describe Manifest do
       manifest = Manifest.new({}, &rules)
       expect { manifest.validate }.to change { manifest.errors }.from({})
     end
+
+    context "validation rules" do
+      describe "#required" do
+        it "results in an error when the value is missing" do
+          rules = lambda { required "method", // }
+          manifest = Manifest.new({}, &rules)
+
+          manifest.validate.should be_false
+          manifest.errors.should eq({ "method" => [:required, manifest.rules[0]] })
+        end
+
+        it "results in an error when the value does not match" do
+          rules = lambda { required "content-type", %r|image/jpe?g| }
+          manifest = Manifest.new({ "content-type" => "image/png" }, &rules)
+
+          manifest.validate.should be_false
+          manifest.errors.should eq({ "content-type" => [:match, manifest.rules[0]] })
+        end
+
+        it "does not accept arbitrary constraint values" do
+          rules = lambda { required "method", false }
+          expect { Manifest.new({}, &rules) }.to raise_error(ArgumentError, /unknown matcher/)
+        end
+
+        it "can match a regexp" do
+          rules = lambda { required "content-type", %r|image/jpe?g| }
+
+          Manifest.new({ "content-type" => "image/jpeg" }, &rules).validate.should be_true
+          Manifest.new({ "content-type" => "image/jpg" }, &rules).validate.should be_true
+          Manifest.new({ "content-type" => "image/png" }, &rules).validate.should be_false
+        end
+
+        it "can match a literal string" do
+          rules = lambda { required "content-type", "image/jpeg" }
+
+          Manifest.new({ "content-type" => "image/jpeg" }, &rules).validate.should be_true
+          Manifest.new({ "content-type" => "image/jpg" }, &rules).validate.should be_false
+        end
+
+        it "can match an array" do
+          rules = lambda { required "content-type", ["image/jpeg", "image/png"] }
+
+          Manifest.new({ "content-type" => "image/jpeg" }, &rules).validate.should be_true
+          Manifest.new({ "content-type" => "image/png" }, &rules).validate.should be_true
+          Manifest.new({ "content-type" => "image/jpg" }, &rules).validate.should be_false
+        end
+      end
+
+      describe "#optional" do
+        it "results in no error when the value is missing"
+
+        it "can accept false and nil as values"
+        it "can match a regexp"
+        it "can match a literal string"
+        it "can match an array"
+      end
+    end
   end
 
   describe "#sign" do
     it "signs the manifest if it is valid" do
       manifest = Manifest.new(attributes, &rules)
-      manifest.should_receive(:valid?).and_return(true)
       manifest.sign("LAWL", "HELLO").should eq "AWS LAWL:AT+TyO+xcWzLFqHGDR4jRDFdUUc="
     end
 

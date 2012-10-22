@@ -20,12 +20,14 @@ class Manifest
   def validate
     @errors = rules.each_with_object({}) do |rule, failures|
       fail = lambda do |reason|
-        (failures[rule[:name]] ||= []) << [reason, rule]
+        failures[rule[:name]] = [reason, rule]
       end
 
-      value = attributes.fetch(rule[:name]) do
+      unless attributes.has_key?(rule[:name])
         fail[:required] if rule[:required]
         next
+      else
+        value = attributes[rule[:name]]
       end
 
       unless rule[:matcher].call(value)
@@ -35,6 +37,8 @@ class Manifest
 
     errors.none?
   end
+
+  alias valid? validate
 
   def rules
     @rules ||= []
@@ -76,6 +80,8 @@ class Manifest
       constraints.method(:===)
     elsif constraints.is_a?(Array)
       constraints.method(:include?)
+    else
+      raise ArgumentError, "unknown matcher #{(constraints || block).inspect}"
     end
 
     { name: name, matcher: matcher, options: options, required: true }.tap do |rule|
