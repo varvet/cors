@@ -68,7 +68,7 @@ class Manifest
 
   def normalized_headers
     attributes.select  { |property, _| property =~ /x-amz-/ }
-              .map     { |(header, values)| [property.downcase, values] }
+              .map     { |(header, values)| [header.downcase, values] }
               .sort_by { |(header, _)| header }
   end
 

@@ -1,17 +1,33 @@
+require "base64"
+require "date"
+
 describe Manifest do
   let(:attributes) do
     {
-      "method" => "GET",
+      "method" => "PUT",
+      "md5"    => "CCummMp6o4ZgypU7ePh7QA==",
+      "content-type" => "image/jpeg",
+      "x-amz-meta-filename" => "roflcopter.gif",
+      "x-amz-date" => "2012-10-22T16:10:47+02:00",
+      "x-amz-meta-ROFLCOPTER" => ["yes", "no", "maybe"],
+      "x-not-amz-header" => "I am ignored",
+      "filename" => "uploads/roflcopter.gif"
     }
   end
 
   let(:rules) do
     lambda do
-      required "method", %w[GET]
+      required "method", "PUT"
+      optional "md5" do |value|
+        Base64.strict_decode64(value)
+      end
+      required "content-type", %r|image/|
+      required "x-amz-date" do |date|
+        "2012-10-22T16:10:47+02:00" == date
+      end
+      required "filename", %r|uploads/|
     end
   end
-
-  let(:manifest) { Manifest.new(attributes, &rules) }
 
   describe "#initialize" do
     it "requires a block" do
@@ -29,6 +45,7 @@ describe Manifest do
 
   describe "#validate" do
     it "returns true if validation succeeds" do
+      manifest = Manifest.new(attributes, &rules)
       manifest.should be_valid
       manifest.errors.should eq({})
     end
@@ -87,6 +104,17 @@ describe Manifest do
           Manifest.new({ "content-type" => "image/png" }, &rules).should be_valid
           Manifest.new({ "content-type" => "image/jpg" }, &rules).should_not be_valid
         end
+
+        it "can match a block" do
+          rules = lambda do
+            required "content-type" do |type|
+              "image/jpeg" == type
+            end
+          end
+
+          Manifest.new({ "content-type" => "image/jpeg" }, &rules).should be_valid
+          Manifest.new({ "content-type" => "image/png" }, &rules).should_not be_valid
+        end
       end
 
       describe "#optional" do
@@ -107,10 +135,26 @@ describe Manifest do
     end
   end
 
+  describe "#manifest" do
+    it "is built according to specifications" do
+      manifest = Manifest.new(attributes, &rules)
+      manifest.manifest.should eq <<-MANIFEST.gsub(/^ +/, "").rstrip
+        PUT
+        CCummMp6o4ZgypU7ePh7QA==
+        image/jpeg
+
+        x-amz-date:2012-10-22T16:10:47+02:00
+        x-amz-meta-filename:roflcopter.gif
+        x-amz-meta-roflcopter:yes,no,maybe
+        uploads/roflcopter.gif
+      MANIFEST
+    end
+  end
+
   describe "#sign" do
     it "signs the manifest if it is valid" do
       manifest = Manifest.new(attributes, &rules)
-      manifest.sign("LAWL", "HELLO").should eq "AWS LAWL:AT+TyO+xcWzLFqHGDR4jRDFdUUc="
+      manifest.sign("LAWL", "HELLO").should eq "AWS LAWL:WZGsk2VzLz85B6oU19a5+fvzxXM="
     end
 
     it "does not sign if the manifest is invalid" do
