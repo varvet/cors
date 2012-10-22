@@ -96,10 +96,13 @@ describe Manifest do
           manifest.should be_valid
         end
 
-        it "can accept false and nil as values"
-        it "can match a regexp"
-        it "can match a literal string"
-        it "can match an array"
+        it "results in an error when the value is present but does not match" do
+          rules = lambda { optional "content-type", %r|image/jpe?g| }
+          manifest = Manifest.new({ "content-type" => "image/png" }, &rules)
+
+          manifest.should_not be_valid
+          manifest.errors.should eq({ "content-type" => [:match, manifest.rules[0]] })
+        end
       end
     end
   end
