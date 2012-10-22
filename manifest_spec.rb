@@ -16,16 +16,24 @@ describe Manifest do
   end
 
   let(:rules) do
-    lambda do
-      required "method", "PUT"
-      optional "md5" do |value|
+    lambda do |manifest|
+      manifest.required "method", "PUT"
+      manifest.optional "md5" do |value|
         Base64.strict_decode64(value)
       end
-      required "content-type", %r|image/|
-      required "x-amz-date" do |date|
+      manifest.required "content-type", %r|image/|
+      manifest.required "x-amz-date" do |date|
         "2012-10-22T16:10:47+02:00" == date
       end
-      required "filename", %r|uploads/|
+      manifest.required "filename", %r|uploads/|
+    end
+  end
+
+  describe Manifest::Rules do
+    describe "#each" do
+      it "returns an enumerator if not given a block" do
+        Manifest::Rules.new.each.should be_an Enumerator
+      end
     end
   end
 
@@ -62,28 +70,28 @@ describe Manifest do
     context "validation rules" do
       describe "#required" do
         it "does not accept arbitrary constraints" do
-          rules = lambda { required "method", false }
+          rules = lambda { |manifest| manifest.required "method", false }
           expect { Manifest.new({}, &rules) }.to raise_error(ArgumentError, /unknown matcher/)
         end
 
         it "results in an error when the value is missing" do
-          rules = lambda { required "method", // }
+          rules = lambda { |manifest| manifest.required "method", // }
           manifest = Manifest.new({}, &rules)
 
           manifest.should_not be_valid
-          manifest.errors.should eq({ "method" => [:required, manifest.rules[0]] })
+          manifest.errors.should eq({ "method" => [:required, manifest.rules.first] })
         end
 
         it "results in an error when the value does not match" do
-          rules = lambda { required "content-type", %r|image/jpe?g| }
+          rules = lambda { |manifest| manifest.required "content-type", %r|image/jpe?g| }
           manifest = Manifest.new({ "content-type" => "image/png" }, &rules)
 
           manifest.should_not be_valid
-          manifest.errors.should eq({ "content-type" => [:match, manifest.rules[0]] })
+          manifest.errors.should eq({ "content-type" => [:match, manifest.rules.first] })
         end
 
         it "can match a regexp" do
-          rules = lambda { required "content-type", %r|image/jpe?g| }
+          rules = lambda { |manifest| manifest.required "content-type", %r|image/jpe?g| }
 
           Manifest.new({ "content-type" => "image/jpeg" }, &rules).should be_valid
           Manifest.new({ "content-type" => "image/jpg" }, &rules).should be_valid
@@ -91,14 +99,14 @@ describe Manifest do
         end
 
         it "can match a literal string" do
-          rules = lambda { required "content-type", "image/jpeg" }
+          rules = lambda { |manifest| manifest.required "content-type", "image/jpeg" }
 
           Manifest.new({ "content-type" => "image/jpeg" }, &rules).should be_valid
           Manifest.new({ "content-type" => "image/jpg" }, &rules).should_not be_valid
         end
 
         it "can match an array" do
-          rules = lambda { required "content-type", ["image/jpeg", "image/png"] }
+          rules = lambda { |manifest| manifest.required "content-type", ["image/jpeg", "image/png"] }
 
           Manifest.new({ "content-type" => "image/jpeg" }, &rules).should be_valid
           Manifest.new({ "content-type" => "image/png" }, &rules).should be_valid
@@ -106,8 +114,8 @@ describe Manifest do
         end
 
         it "can match a block" do
-          rules = lambda do
-            required "content-type" do |type|
+          rules = lambda do |manifest|
+            manifest.required "content-type" do |type|
               "image/jpeg" == type
             end
           end
@@ -119,17 +127,17 @@ describe Manifest do
 
       describe "#optional" do
         it "results in no error when the value is missing" do
-          rules = lambda { optional "method", // }
+          rules = lambda { |manifest| manifest.optional "method", // }
           manifest = Manifest.new({}, &rules)
           manifest.should be_valid
         end
 
         it "results in an error when the value is present but does not match" do
-          rules = lambda { optional "content-type", %r|image/jpe?g| }
+          rules = lambda { |manifest| manifest.optional "content-type", %r|image/jpe?g| }
           manifest = Manifest.new({ "content-type" => "image/png" }, &rules)
 
           manifest.should_not be_valid
-          manifest.errors.should eq({ "content-type" => [:match, manifest.rules[0]] })
+          manifest.errors.should eq({ "content-type" => [:match, manifest.rules.first] })
         end
       end
     end
