@@ -2,10 +2,10 @@
 require "openssl"
 require "base64"
 
-
 class Manifest
   def initialize(attributes, &block)
     @attributes = Hash[attributes.map { |k, v| [k.to_s.downcase, v] }]
+    @errors     = {}
 
     unless block_given?
       raise ArgumentError, "manifest rules must be specified by a block, no block given"
@@ -15,26 +15,29 @@ class Manifest
   end
 
   attr_reader :attributes
+  attr_reader :errors
 
   def validate
-    failures = rules.each_with_object([]) do |rule, failures|
+    @errors = rules.each_with_object({}) do |rule, failures|
+      fail = lambda do |reason|
+        (failures[rule[:name]] ||= []) << [reason, rule]
+      end
+
       value = attributes.fetch(rule[:name]) do
-        failures << [:required, rule] if rule[:required]
+        fail[:required] if rule[:required]
         next
       end
 
-      unless rule[:matcher] === value
-        failures << [:matcher, rule]
+      unless rule[:matcher].call(value)
+        fail[:match]
       end
     end
-  end
 
-  def valid?
-    (failures = validate).none?
+    errors.none?
   end
 
   def rules
-    @rules ||= {}
+    @rules ||= []
   end
 
   def manifest
@@ -67,11 +70,11 @@ class Manifest
 
   def required(name, constraints = nil, options = {}, &block)
     matcher = if block_given? then block
-    elsif constraints.is_a?(Regex)
+    elsif constraints.is_a?(Regexp)
       constraints.method(:===)
     elsif constraints.is_a?(String)
       constraints.method(:===)
-    elsif constriants.is_a?(Array)
+    elsif constraints.is_a?(Array)
       constraints.method(:include?)
     end
 

@@ -7,9 +7,11 @@ describe Manifest do
 
   let(:rules) do
     lambda do
-      # deliberately empty
+      required "method", %w[GET]
     end
   end
+
+  let(:manifest) { Manifest.new(attributes, &rules) }
 
   describe "#initialize" do
     it "requires a block" do
@@ -22,6 +24,30 @@ describe Manifest do
 
     it "stringifies the attribute keys" do
       Manifest.new(cool: :Yo, &rules).attributes.should eq({ "cool" => :Yo })
+    end
+
+    context "validation rules" do
+      describe "#required" do
+      end
+
+      describe "#optional" do
+      end
+    end
+  end
+
+  describe "#validate" do
+    it "returns true if validation succeeds" do
+      manifest.validate.should be_true
+      manifest.errors.should eq({})
+    end
+
+    it "returns false if validation fails" do
+      Manifest.new({}, &rules).validate.should be_false
+    end
+
+    it "populates the hash of errors" do
+      manifest = Manifest.new({}, &rules)
+      expect { manifest.validate }.to change { manifest.errors }.from({})
     end
   end
 
@@ -37,17 +63,5 @@ describe Manifest do
       manifest.should_receive(:valid?).and_return(false)
       manifest.sign("LAWL", "HELLO").should be_nil
     end
-  end
-
-  describe "#required" do
-  end
-
-  describe "#optional" do
-  end
-
-  describe "#validate" do
-  end
-
-  describe "#valid?" do
   end
 end
