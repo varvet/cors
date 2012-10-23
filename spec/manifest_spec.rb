@@ -51,7 +51,7 @@ describe Manifest do
     end
   end
 
-  describe "#validate" do
+  describe "#valid?" do
     it "returns true if validation succeeds" do
       manifest = Manifest.new(attributes, &rules)
       manifest.should be_valid
@@ -64,7 +64,7 @@ describe Manifest do
 
     it "populates the hash of errors" do
       manifest = Manifest.new({}, &rules)
-      expect { manifest.validate }.to change { manifest.errors }.from({})
+      expect { manifest.valid? }.to change { manifest.errors }.from({})
     end
 
     context "validation rules" do

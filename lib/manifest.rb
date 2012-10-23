@@ -39,6 +39,25 @@ class Manifest
     def optional(*args, &block)
       required(*args, &block).tap { |rule| rule[:required] = false }
     end
+
+    def validate(attributes)
+      each_with_object({}) do |rule, failures|
+        fail = lambda do |reason|
+          failures[rule[:name]] = [reason, rule]
+        end
+
+        unless attributes.has_key?(rule[:name])
+          fail[:required] if rule[:required]
+          next
+        else
+          value = attributes[rule[:name]]
+        end
+
+        unless rule[:matcher].call(value)
+          fail[:match]
+        end
+      end
+    end
   end
 
   def initialize(attributes, &block)
@@ -56,28 +75,10 @@ class Manifest
   attr_reader :errors
   attr_reader :rules
 
-  def validate
-    @errors = rules.each_with_object({}) do |rule, failures|
-      fail = lambda do |reason|
-        failures[rule[:name]] = [reason, rule]
-      end
-
-      unless attributes.has_key?(rule[:name])
-        fail[:required] if rule[:required]
-        next
-      else
-        value = attributes[rule[:name]]
-      end
-
-      unless rule[:matcher].call(value)
-        fail[:match]
-      end
-    end
-
-    errors.none?
+  def valid?
+    @errors = rules.validate(attributes)
+    @errors.empty?
   end
-
-  alias valid? validate
 
   def manifest
     [].tap do |manifest|
