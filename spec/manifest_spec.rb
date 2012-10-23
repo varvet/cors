@@ -29,14 +29,6 @@ describe Manifest do
     end
   end
 
-  describe Manifest::Rules do
-    describe "#each" do
-      it "returns an enumerator if not given a block" do
-        Manifest::Rules.new.each.should be_an Enumerator
-      end
-    end
-  end
-
   describe "#initialize" do
     it "requires a block" do
       expect { Manifest.new(attributes) }.to raise_error(ArgumentError, /no block given/)
