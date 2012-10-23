@@ -115,11 +115,9 @@ class Manifest
         unless attributes.has_key?(rule[:name])
           fail[:required] if rule[:required]
           next
-        else
-          value = attributes[rule[:name]]
         end
 
-        unless rule[:matcher].call(value)
+        unless rule[:matcher].call(attributes[rule[:name]])
           fail[:match]
         end
       end
@@ -130,11 +128,11 @@ class Manifest
     @attributes = Hash[attributes.map { |k, v| [k.to_s.downcase, v] }]
     @errors     = {}
 
-    unless block_given?
+    if block_given?
+      @rules = Rules.new(&block)
+    else
       raise ArgumentError, "manifest rules must be specified by a block, no block given"
     end
-
-    @rules = Rules.new(&block)
   end
 
   attr_reader :attributes
