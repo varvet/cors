@@ -1,9 +1,14 @@
-#
+# CORS policy validation- and signing library
 
-## Manifest
+Cross-origin resource sharing (CORS) is great; it allows your visitors to asynchronously upload files to
+e.g. Filepicker or Amazon S3, without the files having to round-trip through your web server. Unfortunately,
+giving your users complete write access to your online storage also exposes you to malicious intent.
 
-Manifest provides a simple DSL for describing what values you will
-and will not accept in the request that will be sent to the AWS API.
+To combat harmful usage, good upload services that allow client-side upload, support a mechanism that allows
+you to validate and sign all upload requests to your online storage. By validating every request, you can
+give your visitors a nice upload experience, while keeping the bad visitors at bay.
+
+## Usage
 
 ```ruby
 UploadManifest = CORS::Policy::S3.create do |policy|
@@ -26,3 +31,36 @@ else
   { error: manifest.errors }
 end
 ```
+
+## Supported services
+
+Out-of-the box, the CORS library comes with support for the Amazon S3 REST API, and Filepicker.io.
+
+### [Amazon S3 REST API](http://docs.amazonwebservices.com/AmazonS3/latest/dev/RESTAuthentication.html)
+
+### [Filepicker.io security](https://developers.filepicker.io/docs/security/)
+
+## License
+
+Copyright (c) 2012 Kim Burgestrand
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
