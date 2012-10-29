@@ -10,8 +10,8 @@ module Manifest
 
     def initialize(attributes, rules = self.class.rules)
       @attributes = Hash[attributes.map { |k, v| [k.to_s.downcase, v] }]
-      @errors     = {}
-      @rules      = rules
+      @errors = rules.validate(@attributes)
+      @rules = rules
     end
 
     attr_reader :attributes
@@ -19,7 +19,6 @@ module Manifest
     attr_reader :rules
 
     def valid?
-      @errors = rules.validate(attributes)
       @errors.empty?
     end
 
@@ -37,7 +36,7 @@ module Manifest
     end
 
     def sign(access_key, secret_access_key)
-      return unless valid?
+      return if not valid?
       digest = OpenSSL::HMAC.digest("sha1", secret_access_key, manifest)
       signature = Base64.strict_encode64(digest)
       "AWS #{access_key}:#{signature}"

@@ -45,6 +45,10 @@ describe Manifest do
     it "stringifies the attribute keys" do
       manifest.new(cool: :Yo).attributes.should eq({ "cool" => :Yo })
     end
+
+    it "populates the hash of errors" do
+      manifest.new({}).errors.should_not be_empty
+    end
   end
 
   describe "#valid?" do
@@ -57,12 +61,6 @@ describe Manifest do
 
     it "returns false if validation fails" do
       manifest.new({}).should_not be_valid
-    end
-
-    it "populates the hash of errors" do
-      manifest.new({}).tap do |manifest|
-        expect { manifest.valid? }.to change { manifest.errors }.from({})
-      end
     end
 
     context "validation rules" do
