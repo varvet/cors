@@ -27,7 +27,7 @@ module CORS
     end
 
     def rules
-      self.class.rules
+      self.class.rules or raise "no rules defined for policy #{inspect}"
     end
 
     def valid?

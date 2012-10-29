@@ -51,6 +51,12 @@ describe CORS do
     end
   end
 
+  describe "#rules" do
+    it "raises an error if no rules have been defined" do
+      expect { CORS::Policy::S3.new({}) }.to raise_error(/no rules defined/)
+    end
+  end
+
   describe "#valid?" do
     it "returns true if validation succeeds" do
       manifest.new(attributes).tap do |manifest|
