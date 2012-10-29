@@ -22,7 +22,7 @@ module CORS
     end
 
     def initialize(attributes)
-      self.attributes = attributes
+      self.attributes = Hash[attributes.map { |k, v| [k.to_s.downcase, v] }]
       self.errors = rules.validate(self.attributes)
     end
 

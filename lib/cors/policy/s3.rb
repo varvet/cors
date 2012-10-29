@@ -6,10 +6,6 @@ module CORS::Policy
   class S3
     include CORS::Policy
 
-    def initialize(attributes)
-      super(Hash[attributes.map { |k, v| [k.to_s.downcase, v] }])
-    end
-
     def manifest
       [].tap do |manifest|
         manifest << attributes["method"].upcase
