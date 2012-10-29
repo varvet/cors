@@ -1,1 +1,1 @@
-require "manifest"
+require "cors"

@@ -1,4 +1,4 @@
-module Manifest
+module CORS
   # Internal class for handling rule definitions and validation.
   #
   # @private

@@ -2,24 +2,12 @@ require "openssl"
 require "base64"
 
 # @public
-module Manifest
-  class Request
-    class << self
-      attr_reader :rules
-    end
+module CORS::Policy
+  class S3
+    include CORS::Policy
 
-    def initialize(attributes, rules = self.class.rules)
-      @attributes = Hash[attributes.map { |k, v| [k.to_s.downcase, v] }]
-      @errors = rules.validate(@attributes)
-      @rules = rules
-    end
-
-    attr_reader :attributes
-    attr_reader :errors
-    attr_reader :rules
-
-    def valid?
-      @errors.empty?
+    def initialize(attributes)
+      super(Hash[attributes.map { |k, v| [k.to_s.downcase, v] }])
     end
 
     def manifest
@@ -51,4 +39,3 @@ module Manifest
     end
   end
 end
-

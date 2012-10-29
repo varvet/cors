@@ -1,7 +1,7 @@
 require "base64"
 require "date"
 
-describe Manifest do
+describe CORS do
   let(:attributes) do
     {
       "method" => "PUT",
@@ -29,11 +29,11 @@ describe Manifest do
     end
   end
 
-  let(:manifest) { Manifest.new(&rules) }
+  let(:manifest) { CORS::Policy::S3.create(&rules) }
 
   describe ".initialize" do
     it "requires a block" do
-      expect { Manifest.new }.to raise_error(ArgumentError, /no block given/)
+      expect { CORS::Policy::S3.create }.to raise_error(ArgumentError, /no block given/)
     end
   end
 
@@ -67,12 +67,12 @@ describe Manifest do
       describe "#required" do
         it "does not accept arbitrary constraints" do
           rules = lambda { |manifest| manifest.required "method", false }
-          expect { Manifest.new(&rules) }.to raise_error(ArgumentError, /unknown matcher/)
+          expect { CORS::Policy::S3.create(&rules) }.to raise_error(ArgumentError, /unknown matcher/)
         end
 
         it "results in an error when the value is missing" do
           rules = lambda { |manifest| manifest.required "method", // }
-          manifest = Manifest.new(&rules).new({})
+          manifest = CORS::Policy::S3.create(&rules).new({})
 
           manifest.should_not be_valid
           manifest.errors.should eq({ "method" => [:required, manifest.rules.first] })
@@ -80,7 +80,7 @@ describe Manifest do
 
         it "results in an error when the value does not match" do
           rules = lambda { |manifest| manifest.required "content-type", %r|image/jpe?g| }
-          manifest = Manifest.new(&rules).new({ "content-type" => "image/png" })
+          manifest = CORS::Policy::S3.create(&rules).new({ "content-type" => "image/png" })
 
           manifest.should_not be_valid
           manifest.errors.should eq({ "content-type" => [:match, manifest.rules.first] })
@@ -88,7 +88,7 @@ describe Manifest do
 
         it "can match a regexp" do
           rules = lambda { |manifest| manifest.required "content-type", %r|image/jpe?g| }
-          manifest = Manifest.new(&rules)
+          manifest = CORS::Policy::S3.create(&rules)
 
           manifest.new({ "content-type" => "image/jpeg" }).should be_valid
           manifest.new({ "content-type" => "image/jpg" }).should be_valid
@@ -97,7 +97,7 @@ describe Manifest do
 
         it "can match a literal string" do
           rules = lambda { |manifest| manifest.required "content-type", "image/jpeg" }
-          manifest = Manifest.new(&rules)
+          manifest = CORS::Policy::S3.create(&rules)
 
           manifest.new({ "content-type" => "image/jpeg" }).should be_valid
           manifest.new({ "content-type" => "image/jpg" }).should_not be_valid
@@ -105,7 +105,7 @@ describe Manifest do
 
         it "can match an array" do
           rules = lambda { |manifest| manifest.required "content-type", ["image/jpeg", "image/png"] }
-          manifest = Manifest.new(&rules)
+          manifest = CORS::Policy::S3.create(&rules)
 
           manifest.new({ "content-type" => "image/jpeg" }).should be_valid
           manifest.new({ "content-type" => "image/png" }).should be_valid
@@ -118,7 +118,7 @@ describe Manifest do
               "image/jpeg" == type
             end
           end
-          manifest = Manifest.new(&rules)
+          manifest = CORS::Policy::S3.create(&rules)
 
           manifest.new({ "content-type" => "image/jpeg" }).should be_valid
           manifest.new({ "content-type" => "image/png" }).should_not be_valid
@@ -128,13 +128,13 @@ describe Manifest do
       describe "#optional" do
         it "results in no error when the value is missing" do
           rules = lambda { |manifest| manifest.optional "method", // }
-          manifest = Manifest.new(&rules).new({})
+          manifest = CORS::Policy::S3.create(&rules).new({})
           manifest.should be_valid
         end
 
         it "results in an error when the value is present but does not match" do
           rules = lambda { |manifest| manifest.optional "content-type", %r|image/jpe?g| }
-          manifest = Manifest.new(&rules).new({ "content-type" => "image/png" })
+          manifest = CORS::Policy::S3.create(&rules).new({ "content-type" => "image/png" })
 
           manifest.should_not be_valid
           manifest.errors.should eq({ "content-type" => [:match, manifest.rules.first] })
@@ -145,7 +145,7 @@ describe Manifest do
 
   describe "#manifest" do
     it "is built according to specifications" do
-      manifest = Manifest.new(&rules).new(attributes)
+      manifest = CORS::Policy::S3.create(&rules).new(attributes)
       manifest.manifest.should eq <<-MANIFEST.gsub(/^ +/, "").rstrip
         PUT
         CCummMp6o4ZgypU7ePh7QA==
@@ -161,12 +161,12 @@ describe Manifest do
 
   describe "#sign" do
     it "signs the manifest if it is valid" do
-      manifest = Manifest.new(&rules).new(attributes)
+      manifest = CORS::Policy::S3.create(&rules).new(attributes)
       manifest.sign("LAWL", "HELLO").should eq "AWS LAWL:WZGsk2VzLz85B6oU19a5+fvzxXM="
     end
 
     it "does not sign if the manifest is invalid" do
-      manifest = Manifest.new(&rules).new(attributes)
+      manifest = CORS::Policy::S3.create(&rules).new(attributes)
       manifest.should_receive(:valid?).and_return(false)
       manifest.sign("LAWL", "HELLO").should be_nil
     end
