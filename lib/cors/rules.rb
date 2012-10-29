@@ -99,7 +99,7 @@ module CORS
     #   end
     #
     # @see required
-    # @param [#has_key?, #[]]
+    # @param [#has_key?, #[]] attributes
     # @return [Hash<name: [reason, rule]>] list of errors, empty if attributes are valid
     def validate(attributes)
       each_with_object({}) do |rule, failures|

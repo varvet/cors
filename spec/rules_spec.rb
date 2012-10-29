@@ -2,7 +2,7 @@ describe CORS::Rules do
   describe "#each" do
     let(:list) { [] }
     let(:rules) do
-      rules = CORS::Rules.new do |rules|
+      CORS::Rules.new do |rules|
         list << rules.required("yay", //)
         list << rules.optional("boo", //)
       end
