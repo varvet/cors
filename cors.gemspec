@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'cors/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "CORS"
+  gem.name          = "cors"
   gem.version       = CORS::VERSION
   gem.authors       = ["Kim Burgestrand"]
   gem.email         = ["kim@burgestrand.se"]
