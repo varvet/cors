@@ -1,4 +1,6 @@
-# CORS policy validation- and signing library
+# CORS policy validation- and signing library 
+
+[![Build Status](https://secure.travis-ci.org/elabs/cors.png)](http://travis-ci.org/elabs/cors)
 
 Cross-origin resource sharing (CORS) is great; it allows your visitors to asynchronously upload files to
 e.g. Filepicker or Amazon S3, without the files having to round-trip through your web server. Unfortunately,
