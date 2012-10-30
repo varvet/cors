@@ -23,7 +23,7 @@ Gem::Specification.new do |gem|
     your visitors a nice upload experience, while keeping the bad visitors at
     bay.
 
-    The CORS gem comes with support for the Amazon S3 REST API, and Filepicker.io.
+    The CORS gem comes with support for the Amazon S3 REST API.
   DESCRIPTION
 
   gem.files         = `git ls-files`.split($/)

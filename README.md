@@ -34,11 +34,10 @@ end
 
 ## Supported services
 
-Out-of-the box, the CORS library comes with support for the Amazon S3 REST API, and Filepicker.io.
+Out-of-the box, the CORS library comes with support for the Amazon S3 REST API. Support
+for Filepicker is planned.
 
-### [Amazon S3 REST API](http://docs.amazonwebservices.com/AmazonS3/latest/dev/RESTAuthentication.html)
-
-### [Filepicker.io security](https://developers.filepicker.io/docs/security/)
+- [Amazon S3 REST API](http://docs.amazonwebservices.com/AmazonS4/latest/dev/RESTAuthentication.html)
 
 ## License
 
