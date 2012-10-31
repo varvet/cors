@@ -27,7 +27,11 @@ describe CORS::Policy do
     end
 
     it "normalizes the attribute keys" do
-      manifest.new(cOOl: :Yo).attributes.should eq({ "cool" => :Yo })
+      manifest.new(anYTHIng: :Yo).attributes.should eq({ "anything" => :Yo })
+    end
+
+    it "removes attributes not covered by any rules" do
+      manifest.new(cOOl: :Yo).attributes.should eq({})
     end
 
     it "populates the hash of errors" do

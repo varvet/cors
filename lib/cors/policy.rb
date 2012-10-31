@@ -71,7 +71,7 @@ module CORS
     # @see errors
     # @see valid?
     def initialize(attributes)
-      self.attributes = Hash[attributes.map { |k, v| [k.to_s.downcase, v] }]
+      self.attributes = Hash[normalize_attributes(attributes)]
       self.errors = rules.validate(self.attributes)
     end
 
@@ -104,6 +104,13 @@ module CORS
     # @return [String] signature derived from the manifest
     def sign(*)
       raise NotImplementedError, "#sign has not been defined on #{inspect}"
+    end
+
+    protected
+
+    def normalize_attributes(attributes)
+      attributes = attributes.map { |k, v| [k.to_s.downcase, v] }
+      attributes.select { |(k, v)| rules[k] }
     end
   end
 end
