@@ -15,6 +15,7 @@ module CORS
     # @yieldparam [Rules] self
     def initialize
       @rules = []
+      @rules_map = Hash.new { |h, k| h[k] = [] }
       yield self if block_given?
     end
 
@@ -38,6 +39,14 @@ module CORS
       else
         @rules.enum_for(__method__)
       end
+    end
+
+    # Retrieve a list of rules for a given attribute.
+    #
+    # @param name same name as given to {#required} or {#optional}
+    # @return [Array<Hash<:name, :matcher, :required>>, nil] list of rules for attribute, or nil.
+    def [](name)
+      @rules_map.fetch(name, nil)
     end
 
     # Declare a required rule; the value must be present, and it must
@@ -76,6 +85,7 @@ module CORS
 
       { name: name, matcher: matcher, required: true }.tap do |rule|
         @rules << rule
+        @rules_map[name] << rule
       end
     end
 

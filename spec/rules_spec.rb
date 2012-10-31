@@ -17,6 +17,28 @@ describe CORS::Rules do
     end
   end
 
+  describe "#[]" do
+    let(:yay) { [] }
+    let(:boo) { [] }
+
+    let(:rules) do
+      CORS::Rules.new do |r|
+        yay << r.required("yay", //)
+        yay << r.required("yay", /./)
+        boo << r.optional("boo", //)
+      end
+    end
+
+    it "returns the list of rules for a property" do
+      rules["yay"].should eq yay
+      rules["boo"].should eq boo
+    end
+
+    it "returns nil if there are no rules for the property" do
+      rules["does_not_exist"].should be_nil
+    end
+  end
+
   describe "#required" do
     it "does not accept arbitrary constraints" do
       expect { CORS::Rules.new { |r| r.required "method", false } }.to raise_error(ArgumentError, /unknown matcher/)
