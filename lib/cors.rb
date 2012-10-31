@@ -3,6 +3,7 @@ require "cors/version"
 require "cors/rules"
 require "cors/policy"
 require "cors/policy/s3"
+require "cors/policy/s3_post"
 
 # CORS policy validation and signature generation.
 #
