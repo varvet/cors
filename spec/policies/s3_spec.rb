@@ -48,16 +48,10 @@ describe CORS::Policy::S3 do
     end
   end
 
-  describe "#sign" do
-    it "signs the manifest if it is valid" do
-      manifest = CORS::Policy::S3.create(&rules).new(valid_attributes)
-      manifest.sign("LAWL", "HELLO").should eq "AWS LAWL:WZGsk2VzLz85B6oU19a5+fvzxXM="
-    end
-
-    it "does not sign if the manifest is invalid" do
-      manifest = CORS::Policy::S3.create(&rules).new(valid_attributes)
-      manifest.should_receive(:valid?).and_return(false)
-      manifest.sign("LAWL", "HELLO").should be_nil
+  describe "#sign!" do
+    it "unconditionally signs the manifest" do
+      policy = manifest.new(valid_attributes)
+      policy.sign!("LAWL", "HELLO").should eq "AWS LAWL:WZGsk2VzLz85B6oU19a5+fvzxXM="
     end
   end
 end

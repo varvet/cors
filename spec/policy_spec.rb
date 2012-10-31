@@ -61,4 +61,18 @@ describe CORS::Policy do
       manifest.new({}).should_not be_valid
     end
   end
+
+  describe "#sign" do
+    it "delegates to sign! if the manifest is valid" do
+      request = manifest.new(valid_attributes)
+      request.should_receive(:sign!).with(:a, :b).and_return("OK")
+      request.sign(:a, :b).should eq "OK"
+    end
+
+    it "does nothing if the manifest is not valid" do
+      request = manifest.new({})
+      request.should_not_receive(:sign!)
+      request.sign(:a, :b).should be_nil
+    end
+  end
 end

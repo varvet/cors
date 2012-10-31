@@ -94,15 +94,17 @@ module CORS
       errors.empty?
     end
 
-    # @note must be overridden by includers!
-    # @return [String] the compiled manifest
-    def manifest
-      raise NotImplementedError, "#manifest has not been defined on #{inspect}"
+    # Signs the manifest, but only if it is {#valid?}.
+    #
+    # @note should not be overridden by the includers!
+    # @return (see #sign!)
+    def sign(*args, &block)
+      sign!(*args, &block) if valid?
     end
 
-    # @note must be overridden by includers!
+    # @note should be overridden by includers!
     # @return [String] signature derived from the manifest
-    def sign(*)
+    def sign!(*)
       raise NotImplementedError, "#sign has not been defined on #{inspect}"
     end
 
@@ -110,7 +112,7 @@ module CORS
 
     def normalize_attributes(attributes)
       attributes = attributes.map { |k, v| [k.to_s.downcase, v] }
-      attributes.select { |(k, v)| rules[k] }
+      attributes.select { |(k, _)| rules[k] }
     end
   end
 end

@@ -28,8 +28,7 @@ module CORS::Policy
     #
     # @param [String] access_key
     # @param [String] secret_access_key
-    def sign(access_key, secret_access_key)
-      return if not valid?
+    def sign!(access_key, secret_access_key)
       digest = OpenSSL::HMAC.digest("sha1", secret_access_key, manifest)
       signature = Base64.strict_encode64(digest)
       "AWS #{access_key}:#{signature}"
