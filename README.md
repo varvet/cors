@@ -39,7 +39,8 @@ end
 Out-of-the box, the CORS library comes with support for the Amazon S3 REST API. Support
 for Filepicker is planned.
 
-- [Amazon S3 REST API](http://docs.amazonwebservices.com/AmazonS4/latest/dev/RESTAuthentication.html)
+- [Amazon S3 REST API Authentication Header](http://docs.amazonwebservices.com/AmazonS3/latest/dev/RESTAuthentication.html#ConstructingTheAuthenticationHeader)
+- [Amazon S3 REST API POST Upload Policy](http://docs.amazonwebservices.com/AmazonS3/latest/dev/HTTPPOSTForms.html#HTTPPOSTConstructPolicy)
 
 ## License
 
