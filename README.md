@@ -3,7 +3,7 @@
 [![Build Status](https://secure.travis-ci.org/elabs/cors.png)](http://travis-ci.org/elabs/cors)
 
 Cross-origin resource sharing (CORS) is great; it allows your visitors to asynchronously upload files to
-e.g. Filepicker or Amazon S3, without the files having to round-trip through your web server. Unfortunately,
+e.g. Amazon S3, without the files having to round-trip through your web server. Unfortunately,
 giving your users complete write access to your online storage also exposes you to malicious intent.
 
 To combat harmful usage, good upload services that allow client-side upload, support a mechanism that allows
@@ -36,8 +36,7 @@ end
 
 ## Supported services
 
-Out-of-the box, the CORS library comes with support for the Amazon S3 REST API. Support
-for Filepicker is planned.
+Out-of-the box, the CORS library comes with support for the Amazon S3 REST API.
 
 - [Amazon S3 REST API Authentication Header](http://docs.amazonwebservices.com/AmazonS3/latest/dev/RESTAuthentication.html#ConstructingTheAuthenticationHeader)
 - [Amazon S3 REST API POST Upload Policy](http://docs.amazonwebservices.com/AmazonS3/latest/dev/HTTPPOSTForms.html#HTTPPOSTConstructPolicy)
