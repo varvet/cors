@@ -9,11 +9,11 @@ describe CORS::Rules do
     end
 
     it "is enumerable" do
-      rules.each_with_object([]) { |rule, result| result << rule }.should eq(list)
+      expect(rules.each_with_object([]) { |rule, result| result << rule }).to eq(list)
     end
 
     it "returns an enumerator without a block" do
-      rules.each.with_object([]) { |rule, result| result << rule }.should eq(list)
+      expect(rules.each.with_object([]) { |rule, result| result << rule }).to eq(list)
     end
   end
 
@@ -30,12 +30,12 @@ describe CORS::Rules do
     end
 
     it "returns the list of rules for a property" do
-      rules["yay"].should eq yay
-      rules["boo"].should eq boo
+      expect(rules["yay"]).to eq yay
+      expect(rules["boo"]).to eq boo
     end
 
     it "returns nil if there are no rules for the property" do
-      rules["does_not_exist"].should be_nil
+      expect(rules["does_not_exist"]).to be_nil
     end
   end
 
@@ -48,37 +48,37 @@ describe CORS::Rules do
       rules  = CORS::Rules.new { |r| r.required "method", // }
       errors = rules.validate({})
 
-      errors.should eq({ "method" => [:required, rules.first] })
+      expect(errors).to eq({ "method" => [:required, rules.first] })
     end
 
     it "results in an error when the value does not match" do
       rules = CORS::Rules.new { |r| r.required "content-type", %r|image/jpe?g| }
       errors = rules.validate({ "content-type" => "image/png" })
 
-      errors.should eq({ "content-type" => [:match, rules.first] })
+      expect(errors).to eq({ "content-type" => [:match, rules.first] })
     end
 
     it "can match a regexp" do
       rules = CORS::Rules.new { |r| r.required "content-type", %r|image/jpe?g| }
 
-      rules.validate({ "content-type" => "image/jpeg" }).should be_empty
-      rules.validate({ "content-type" => "image/jpg" }).should be_empty
-      rules.validate({ "content-type" => "image/png" }).should_not be_empty
+      expect(rules.validate({ "content-type" => "image/jpeg" })).to be_empty
+      expect(rules.validate({ "content-type" => "image/jpg" })).to be_empty
+      expect(rules.validate({ "content-type" => "image/png" })).to_not be_empty
     end
 
     it "can match a literal string" do
       rules = CORS::Rules.new { |r| r.required "content-type", "image/jpeg" }
 
-      rules.validate({ "content-type" => "image/jpeg" }).should be_empty
-      rules.validate({ "content-type" => "image/jpg" }).should_not be_empty
+      expect(rules.validate({ "content-type" => "image/jpeg" })).to be_empty
+      expect(rules.validate({ "content-type" => "image/jpg" })).to_not be_empty
     end
 
     it "can match an array" do
       rules = CORS::Rules.new { |r| r.required "content-type", ["image/jpeg", "image/png"] }
 
-      rules.validate({ "content-type" => "image/jpeg" }).should be_empty
-      rules.validate({ "content-type" => "image/png" }).should be_empty
-      rules.validate({ "content-type" => "image/jpg" }).should_not be_empty
+      expect(rules.validate({ "content-type" => "image/jpeg" })).to be_empty
+      expect(rules.validate({ "content-type" => "image/png" })).to be_empty
+      expect(rules.validate({ "content-type" => "image/jpg" })).to_not be_empty
     end
 
     it "can match a block" do
@@ -88,8 +88,8 @@ describe CORS::Rules do
         end
       end
 
-      rules.validate({ "content-type" => "image/jpeg" }).should be_empty
-      rules.validate({ "content-type" => "image/png" }).should_not be_empty
+      expect(rules.validate({ "content-type" => "image/jpeg" })).to be_empty
+      expect(rules.validate({ "content-type" => "image/png" })).to_not be_empty
     end
   end
 
@@ -98,14 +98,14 @@ describe CORS::Rules do
       rules = CORS::Rules.new { |r| r.optional "method", // }
       errors = rules.validate({})
 
-      errors.should be_empty
+      expect(errors).to be_empty
     end
 
     it "results in an error when the value is present but does not match" do
       rules = CORS::Rules.new { |r| r.optional "content-type", %r|image/jpe?g| }
       errors = rules.validate({ "content-type" => "image/png" })
 
-      errors.should eq({ "content-type" => [:match, rules.first] })
+      expect(errors).to eq({ "content-type" => [:match, rules.first] })
     end
   end
 end

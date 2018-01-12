@@ -35,7 +35,7 @@ describe CORS::Policy::S3 do
   describe "#manifest" do
     it "is built according to specifications" do
       manifest = CORS::Policy::S3.create(&rules).new(valid_attributes)
-      manifest.manifest.should eq <<-MANIFEST.gsub(/^ +/, "").rstrip
+      expect(manifest.manifest).to eq <<-MANIFEST.gsub(/^ +/, "").rstrip
         PUT
         CCummMp6o4ZgypU7ePh7QA==
         image/jpeg
@@ -51,7 +51,7 @@ describe CORS::Policy::S3 do
   describe "#sign!" do
     it "unconditionally signs the manifest" do
       policy = manifest.new(valid_attributes)
-      policy.sign!("LAWL", "HELLO").should eq "AWS LAWL:WZGsk2VzLz85B6oU19a5+fvzxXM="
+      expect(policy.sign!("LAWL", "HELLO")).to eq "AWS LAWL:WZGsk2VzLz85B6oU19a5+fvzxXM="
     end
   end
 end

@@ -27,15 +27,15 @@ describe CORS::Policy do
     end
 
     it "normalizes the attribute keys" do
-      manifest.new(anYTHIng: :Yo).attributes.should eq({ "anything" => :Yo })
+      expect(manifest.new(anYTHIng: :Yo).attributes).to eq({ "anything" => :Yo })
     end
 
     it "removes attributes not covered by any rules" do
-      manifest.new(cOOl: :Yo).attributes.should eq({})
+      expect(manifest.new(cOOl: :Yo).attributes).to eq({})
     end
 
     it "populates the hash of errors" do
-      manifest.new({}).errors.should_not be_empty
+      expect(manifest.new({}).errors).to_not be_empty
     end
   end
 
@@ -45,34 +45,36 @@ describe CORS::Policy do
     end
 
     it "returns the raw rules" do
-      manifest.rules.should be_a CORS::Rules
+      expect(manifest.rules).to be_a CORS::Rules
     end
   end
 
   describe "#valid?" do
     it "returns true if validation succeeds" do
       manifest.new(valid_attributes).tap do |manifest|
-        manifest.should be_valid
-        manifest.errors.should eq({})
+        expect(manifest).to be_valid
+        expect(manifest.errors).to eq({})
       end
     end
 
     it "returns false if validation fails" do
-      manifest.new({}).should_not be_valid
+      expect(manifest.new({})).to_not be_valid
     end
   end
 
   describe "#sign" do
     it "delegates to sign! if the manifest is valid" do
       request = manifest.new(valid_attributes)
-      request.should_receive(:sign!).with(:a, :b).and_return("OK")
-      request.sign(:a, :b).should eq "OK"
+      allow(request).to receive(:sign!).and_return("OK")
+      expect(request.sign(:a, :b)).to eq "OK"
+      expect(request).to have_received(:sign!)
     end
 
     it "does nothing if the manifest is not valid" do
       request = manifest.new({})
-      request.should_not_receive(:sign!)
-      request.sign(:a, :b).should be_nil
+      allow(request).to receive(:sign!)
+      expect(request).not_to have_received(:sign!)
+      expect(request.sign(:a, :b)).to be_nil
     end
   end
 end

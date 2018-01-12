@@ -32,7 +32,7 @@ describe CORS::Policy::S3Post do
   describe "#manifest" do
     it "generates the policy document as a hash" do
       policy = manifest.new(valid_attributes).policy(now)
-      policy["conditions"].should eq([
+      expect(policy["conditions"]).to eq([
         [ "content-length-range", 678, 678 ],
         [ "eq", "$bucket", "shokunin" ],
         [ "eq", "$key", "upload/BEEFBEEFBEEF.jpg" ],
@@ -47,14 +47,14 @@ describe CORS::Policy::S3Post do
     it "returns the Base64-encoded manifest" do
       request = manifest.new(valid_attributes)
       decoded = Base64.urlsafe_decode64(request.policy_base64(now))
-      MultiJson.load(decoded).should eq(request.policy(now))
+      expect(MultiJson.load(decoded)).to eq(request.policy(now))
     end
   end
 
   describe "#sign!" do
     it "unconditionally signs the manifest" do
       request = manifest.new(valid_attributes)
-      request.sign!("properties", now).should eq "U1YETIAOqT9mEuCebm5B6BM6feQ="
+      expect(request.sign!("properties", now)).to eq("U1YETIAOqT9mEuCebm5B6BM6feQ=")
     end
   end
 end
