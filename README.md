@@ -1,6 +1,6 @@
-# CORS policy validation- and signing library 
+# CORS policy validation- and signing library
 
-[![Build Status](https://secure.travis-ci.org/elabs/cors.png)](http://travis-ci.org/elabs/cors)
+[![Build Status](https://secure.travis-ci.org/varvet/cors.png)](http://travis-ci.org/varvet/cors)
 
 Cross-origin resource sharing (CORS) is great; it allows your visitors to asynchronously upload files to
 e.g. Amazon S3, without the files having to round-trip through your web server. Unfortunately,
@@ -9,6 +9,13 @@ giving your users complete write access to your online storage also exposes you 
 To combat harmful usage, good upload services that allow client-side upload, support a mechanism that allows
 you to validate and sign all upload requests to your online storage. By validating every request, you can
 give your visitors a nice upload experience, while keeping the bad visitors at bay.
+
+## Deprecation
+
+The functionality of CORS is now provided by the ruby AWS SDK. We recommend
+using that instead, as CORS will no longer receive updates:
+
+[Amazon S3 SDK PresignedPost](https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/S3/PresignedPost.html)
 
 ## Usage
 

@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["kim@burgestrand.se"]
   gem.homepage      = "http://github.com/elabs/cors"
   gem.summary       = "CORS policy validation- and signing library for Amazon S3 REST API."
-  gem.description   = <<-DESCRIPTION.gsub(/ +/, "")
+  gem.description   = <<~DESCRIPTION
     Cross-origin resource sharing (CORS) is great; it allows your visitors to
     asynchronously upload files to e.g. Filepicker or Amazon S3, without the
     files having to round-trip through your web server. Unfortunately, giving
@@ -25,6 +25,12 @@ Gem::Specification.new do |gem|
 
     The CORS gem comes with support for the Amazon S3 REST API.
   DESCRIPTION
+  gem.post_install_message = <<~POST_INSTALL_MESSAGE
+    [DEPRECATED] The CORS gem is deprecated and will not receive further updates.
+    The functionality of CORS is now provided by the ruby AWS SDK:
+
+      https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/S3/PresignedPost.html
+  POST_INSTALL_MESSAGE
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
